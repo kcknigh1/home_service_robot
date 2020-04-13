@@ -33,3 +33,5 @@
 
 **/build/*
 **/devel
+
+*rtabmap.db
