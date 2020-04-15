@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
+#include <std_msgs/String.h>
 // #include <rospy
 
 // Define a client for to send goal requests to the move_base server through a SimpleActionClient
@@ -11,6 +12,9 @@ int main(int argc, char** argv){
 //   ros::init(argc, argv, "simple_navigation_goals"); 
   ros::init(argc, argv, "pick_objects");
 
+  ros::NodeHandle n;
+
+  ros::Publisher current_job = n.advertise<std_msgs::String>("/pick_objects/current_job", 10);
   //tell the action client that we want to spin a thread by default
   MoveBaseClient ac("move_base", true);
 
@@ -38,8 +42,12 @@ int main(int argc, char** argv){
   ac.waitForResult();
 
   // Check if the robot reached its goal
-  if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+  if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
     ROS_INFO("Hooray, the base to the pickup location");
+    std_msgs::String job;
+    job.data = "picking up";
+    current_job.publish(job);
+  }
   else
     ROS_INFO("The base failed to move to the pickup location");
 
@@ -62,8 +70,12 @@ int main(int argc, char** argv){
 
 
   // Check if the robot reached its goal
-  if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+  if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED){
     ROS_INFO("Hooray, the base to the dropoff location");
+    std_msgs::String job;
+    job.data = "dropping off";
+    current_job.publish(job);
+  }
   else
     ROS_INFO("The base failed to move to the dropoff location");
   
